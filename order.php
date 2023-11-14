@@ -1,11 +1,13 @@
 <?php
 include "proses/connect.php";
 date_default_timezone_set('Asia/Jakarta');
-$query = mysqli_query($conn, "SELECT tb_order.*,nama, SUM(harga*jumlah) AS harganya FROM tb_order
+$query = mysqli_query($conn, "SELECT tb_order.*,tb_bayar.*,nama, SUM(harga*jumlah) AS harganya FROM tb_order
     LEFT JOIN tb_user ON tb_user.id = tb_order.pelayan
     LEFT JOIN tb_list_order ON tb_list_order.kode_order = tb_order.id_order
     LEFT JOIN tb_daftar_menu ON tb_daftar_menu.id = tb_list_order.menu
-    GROUP BY id_order");
+    LEFT JOIN tb_bayar ON tb_bayar.id_bayar = tb_order.id_order
+
+    GROUP BY id_order ORDER BY waktu_order DESC");
 while ($record = mysqli_fetch_array($query)) {
     $result[] = $record;
 }
@@ -54,7 +56,7 @@ while ($record = mysqli_fetch_array($query)) {
                                     </div>
                                     <div class="col-lg-7">
                                         <div class="form-floating mb-3">
-                                            <input type="text" class="form-control" id="pelanggan" placeholder="Nama Pelanggan" name="pelanggan">
+                                            <input type="text" class="form-control" id="pelanggan" placeholder="Nama Pelanggan" name="pelanggan" required>
                                             <label for="pelanggan">Nama Pelanggan</label>
                                             <div class="invalid-feedback">
                                                 Masukkan Nama Pelanggan
@@ -62,16 +64,13 @@ while ($record = mysqli_fetch_array($query)) {
                                         </div>
                                     </div>
                                 </div>
-
                         </div>
-
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary" name="input_order_validate" value="12345">Buat Order</button>
                         </div>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -109,7 +108,7 @@ while ($record = mysqli_fetch_array($query)) {
                                                 <input type="number" class="form-control" id="meja" placeholder="Nomor Meja" name="meja" required value="<?php echo $row['meja'] ?>">
                                                 <label for="meja">Meja</label>
                                                 <div class="invalid-feedback">
-                                                    Masukkan Meja
+                                                    Masukkan Nomor Meja
                                                 </div>
                                             </div>
                                         </div>
@@ -122,26 +121,13 @@ while ($record = mysqli_fetch_array($query)) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="form-floating mb-3">
-                                                    <input type="text" class="form-control" id="catatan" placeholder="Catatann" name="catatan" required value="<?php echo $row['catatan'] ?>">
-                                                    <label for="catatan">Catatan</label>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-
-
-
-
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                         <button type="submit" class="btn btn-primary" name="edit_order_validate" value="12345">Simpan</button>
                                     </div>
                                 </form>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -213,7 +199,7 @@ while ($record = mysqli_fetch_array($query)) {
                 <?php echo $row['nama'] ?>
             </td>
             <td>
-                <?php echo $row['status'] ?>
+                <?php echo (!empty($row['id_bayar'])) ? "<span class='badge text-bg-success'>dibayar</span>" : "" ; ?>
             </td>
             <td>
                 <?php echo $row['waktu_order'] ?>
@@ -221,8 +207,9 @@ while ($record = mysqli_fetch_array($query)) {
             <td>
                 <div class="d-flex">
                     <a class="btn btn-info btn-sm me-1" href="./?x=orderitem&order=<?php echo $row['id_order'] . "&meja=" . $row['meja'] . "&pelanggan=" . $row['pelanggan'] ?>"><i class="bi bi-eye"></i></a>
-                    <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" data-bs-target="#ModalEdit<?php echo $row['id_order'] ?>"><i class="bi bi-pencil-square"></i></button>
-                    <button class="btn btn-danger btn-sm me-1" data-bs-toggle="modal" data-bs-target="#ModalDelete<?php echo $row['id_order'] ?>"><i class="bi bi-trash"></i></button>
+                    <button class="<?php echo (!empty($row['id_bayar'])) ? "btn btn-secondary btn-sm me-1 disabled" : "btn btn-warning btn-sm me-1"; ?>" data-bs-toggle="modal" data-bs-target="#ModalEdit<?php echo $row['id_order'] ?>"><i class="bi bi-pencil-square"></i></button>
+                                            
+                                            <button class="<?php echo (!empty($row['id_bayar'])) ? "btn btn-secondary btn-sm me-1 disabled" : "btn btn-danger btn-sm me-1"; ?>" data-bs-toggle="modal" data-bs-target="#ModalDelete<?php echo $row['id_order'] ?>"><i class="bi bi-trash"></i></button>
                 </div>
             </td>
             </tr>

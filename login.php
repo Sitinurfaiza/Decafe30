@@ -133,7 +133,7 @@
                 </label>
             </div>
             <button class="w-100 btn btn-lg btn-primary" type="submit" name="submit_validate" value="abc">Login</button>
-            <p class="mt-5 mb-3 text-body-secondary">&copy; 2022–2023</p>
+            <php class="mt-5 mb-3 text-body-secondary">&copy; 2022 - <?php echo date("Y") ?></p>
         </form>
     </main>
 
